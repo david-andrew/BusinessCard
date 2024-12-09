@@ -1,5 +1,5 @@
 # Business Card
-My Business Card in 3D. See it live [here](https://david-andrew.github.io/business-card/).
+My Business Card in 3D. See it live [here](https://david-andrew.github.io/BusinessCard/).
 
 ## Dev
 ### running locally
