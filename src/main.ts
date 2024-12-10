@@ -27,6 +27,7 @@ const main = (scene_fn: (renderer) => SceneFunctions) => {
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.localClippingEnabled = true;
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
     gameView.appendChild(renderer.domElement);
 
     const { update_scene, camera, resetter } = scene_fn(renderer); //rotating_cube_scene();
