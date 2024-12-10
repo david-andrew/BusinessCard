@@ -237,6 +237,15 @@ export class BuildThingScene {
 
         // Tell the parent page that we're ready
         window.parent.postMessage({type: 'READY'}, 'https://david-andrew.github.io');
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            this.camera.aspect = window.innerWidth / window.innerHeight;
+            this.camera.updateProjectionMatrix();
+            this.update_camera();
+        });
+        this.update_camera();
     }
 
     construct_thing = (
@@ -349,6 +358,36 @@ export class BuildThingScene {
         this.copy_group.visible = false;
         this.copy2_group.visible = false;
     };
+
+
+    // update the camera when the window is resized so that the object fits into the window
+    // this is sized specifically for the business card
+    update_camera = () => {
+        const aspect = window.innerWidth / window.innerHeight;
+        const objectWidth = 3.5; //hardcoding dimensions of the business card
+        const objectHeight = 2.0; //hardcoding dimensions of the business card
+        const objectAspect = objectWidth / objectHeight;
+
+        // Determine the limiting dimension (width or height)
+        const fov = THREE.MathUtils.degToRad(this.camera.fov); // Vertical field of view in radians
+        let cameraDistance;
+
+        if (aspect > objectAspect) {
+            // Window is wider relative to the object
+            cameraDistance = objectHeight / (2 * Math.tan(fov / 2));
+        } else {
+            // Window is taller relative to the object
+            const horizontalFov = 2 * Math.atan(Math.tan(fov / 2) * aspect); // Horizontal field of view
+            cameraDistance = objectWidth / (2 * Math.tan(horizontalFov / 2));
+        }
+
+        // Update the camera position
+        console.log('cameraDistance', cameraDistance);
+        const cam_dir = this.camera.position.clone().normalize();
+        cameraDistance += 1; // a little extra distance to make sure the object fits
+        cameraDistance = Math.max(cameraDistance, 3.5);
+        this.camera.position.set(cam_dir.x * cameraDistance, cam_dir.y * cameraDistance, cam_dir.z * cameraDistance);
+    }
 
     // only call on initial press
     determine_fold_sign = () => {
