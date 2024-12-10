@@ -201,9 +201,39 @@ export class BuildThingScene {
             onMove: this.on_move,
             // onRelease: this.on_release, //TODO: uncomment this when we have proper handling of apply_fold()
             faceBounded: false,
-            showPlane: false,
+            showPlane: false
             // enablePan: true,
         });
+
+        // FOR DEMO: set an initial fold by clicking at a specific point
+        /**
+        controls 
+        Object { x: 1.4398937153942544, y: -0.5685615633820004, z: 0 }
+        Object { x: 0, y: 0, z: 1 }
+        Object { isObject3D: true, uuid: "a9960a6e-834b-4735-8558-13f9e03fb1fd", name: "", type: "Mesh", parent: {…}, children: [], up: {…}, position: {…}, rotation: {…}, quaternion: {…}, … }
+        Object { x: 1.5230978466208887, y: -1, z: 0 }
+        Object { x: 1.4398937153942544, y: -0.5685615633820004, z: 0 }
+         */
+        
+        this.controls.touchPoint = new THREE.Vector3(1.4398937153942544, -0.5685615633820004, 0);
+        this.controls.touchNormal = new THREE.Vector3(0.0, 0.0, 1.0);
+        this.controls.touchMesh = this.prime_facets[0].mesh;
+        // show the copy_group
+        this.copy_group.visible = true;
+        this.copy2_group.visible = true;
+
+        //determine the facet that is the root of the fold
+        this.fold_initial_facet_idx = this.prime_mesh_to_facet_idx.get(this.controls.touchMesh);
+        this.determine_fold_sign();
+        // this.determine_fold_from_point();
+        this.from_point = new THREE.Vector3(1.5230978466208887, -1, 0);
+        this.determine_active_facets();
+        this.determine_obstacles();
+        this.hide_inactive_facets(this.copy_facets, this.copy_edges);
+        this.hide_inactive_facets(this.copy2_facets, this.copy2_edges, true);
+
+        // update geometry based on the current state of the fold
+        this.on_move();
     }
 
     construct_thing = (
@@ -828,6 +858,7 @@ export class BuildThingScene {
     };
 
     on_press = () => {
+        console.log('controls', this.controls.touchPoint, this.controls.touchNormal, this.controls.touchMesh);
         // DEBUG. remove when we have proper handling of apply_fold()
         this.on_release();
 
@@ -849,6 +880,7 @@ export class BuildThingScene {
     };
 
     on_move = () => {
+        console.log('controls', this.controls.touchPoint, this.controls.touchNormal, this.controls.touchMesh, this.from_point, this.to_point);
         this.to_point.copy(this.controls.touchPoint);
         this.update_midpoint();
         this.fit_to_workspace_obstacles();
@@ -915,7 +947,6 @@ class Facet {
         geometry.addGroup(0, geometry.attributes.position.count * 2, 1);
         const materials = material_factories.map((factory) => factory({ clippingPlanes: clipping_planes }));
 
-
         ///////////////////////////////////////////////////////////////////////////
         // super hacky add event listener for handling changing colors on materials
         window.addEventListener('message', (event) => {
@@ -930,7 +961,7 @@ class Facet {
                         console.log('setting color0');
                         m.uniforms.color0.value.set(color);
                     }
-                })
+                });
             }
         });
         ///////////////////////////////////////////////////////////////////////////
