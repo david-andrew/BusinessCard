@@ -33,7 +33,7 @@ export const build_thing_scene =
             // (props: MaterialProps = {}) => new THREE.MeshBasicMaterial({ color: 0x2288ff, side: THREE.BackSide, ...props })
         ];
         const scene = new BuildThingScene({ thing_t, renderer, material_factories });
-        scene.camera.position.z = 4;
+        scene.camera.position.z = 4.5;
         return {
             update_scene: scene.update_scene,
             camera: scene.camera,
