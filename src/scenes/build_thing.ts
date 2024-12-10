@@ -234,6 +234,9 @@ export class BuildThingScene {
 
         // update geometry based on the current state of the fold
         this.on_move();
+
+        // Tell the parent page that we're ready
+        window.parent.postMessage({type: 'READY'}, 'https://david-andrew.github.io');
     }
 
     construct_thing = (
@@ -406,7 +409,7 @@ export class BuildThingScene {
 
         //DEBUG: for now, the only active facet is the one initially touched
         this.active_facets.add(this.fold_initial_facet_idx);
-        console.log('active facets', this.active_facets);
+        // console.log('active facets', this.active_facets);
         return;
 
         /**
@@ -858,7 +861,6 @@ export class BuildThingScene {
     };
 
     on_press = () => {
-        console.log('controls', this.controls.touchPoint, this.controls.touchNormal, this.controls.touchMesh);
         // DEBUG. remove when we have proper handling of apply_fold()
         this.on_release();
 
@@ -880,7 +882,6 @@ export class BuildThingScene {
     };
 
     on_move = () => {
-        console.log('controls', this.controls.touchPoint, this.controls.touchNormal, this.controls.touchMesh, this.from_point, this.to_point);
         this.to_point.copy(this.controls.touchPoint);
         this.update_midpoint();
         this.fit_to_workspace_obstacles();
@@ -954,11 +955,9 @@ class Facet {
                 // const color = new THREE.Color(event.data.color);
                 const [r, g, b] = event.data.color;
                 const color = new THREE.Color(r, g, b);
-                console.log('setting color', color, event.data.color);
                 materials.forEach((m: THREE.ShaderMaterial) => {
                     // only materials that have a color0 property can be changed
                     if ('color0' in m.uniforms) {
-                        console.log('setting color0');
                         m.uniforms.color0.value.set(color);
                     }
                 });
