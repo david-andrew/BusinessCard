@@ -79,7 +79,7 @@ type SeigaihaProps = {
 export const seigaiha = ({ color0 = 0x87ceeb, color1 = 0xffffff, side, clippingPlanes }: SeigaihaProps = {}) => {
     return new THREE.ShaderMaterial({
         uniforms: {
-            density: { value: 0.5 },
+            density: { value: 2.0 },
             outer_radius: { value: 0.45 },
             vertical_spacing: { value: 0.5 },
             vertical_stagger: { value: 0.25 },

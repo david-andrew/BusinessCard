@@ -915,6 +915,26 @@ class Facet {
         geometry.addGroup(0, geometry.attributes.position.count * 2, 1);
         const materials = material_factories.map((factory) => factory({ clippingPlanes: clipping_planes }));
 
+
+        ///////////////////////////////////////////////////////////////////////////
+        // super hacky add event listener for handling changing colors on materials
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'SET_COLOR') {
+                // const color = new THREE.Color(event.data.color);
+                const [r, g, b] = event.data.color;
+                const color = new THREE.Color(r, g, b);
+                console.log('setting color', color, event.data.color);
+                materials.forEach((m: THREE.ShaderMaterial) => {
+                    // only materials that have a color0 property can be changed
+                    if ('color0' in m.uniforms) {
+                        console.log('setting color0');
+                        m.uniforms.color0.value.set(color);
+                    }
+                })
+            }
+        });
+        ///////////////////////////////////////////////////////////////////////////
+
         // create the mesh, and transform according to the planar transform and z_offset
         this.mesh = new THREE.Mesh(geometry, materials.length > 1 ? materials : materials[0]);
         this.mesh.applyMatrix4(planar_tf);
